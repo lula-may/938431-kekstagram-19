@@ -59,13 +59,21 @@ var createMockups = function () {
 
 var template = document.querySelector('#picture').content;
 var pictureContainerElement = document.querySelector('.pictures');
+var onPictureClick = function (evt) {
+  evt.preventDefault();
+  var picture = evt.currentTarget;
+  showBigPicture(picture.data);
+};
 var getPhotoList = function (arr) {
   var fragment = document.createDocumentFragment();
   arr.forEach(function (item) {
     var newElement = template.cloneNode(true);
+    var picture = newElement.querySelector('.picture');
     newElement.querySelector('img').src = item.url;
     newElement.querySelector('.picture__likes').textContent = item.likes;
     newElement.querySelector('.picture__comments').textContent = item.comments.length;
+    picture.addEventListener('click', onPictureClick);
+    picture.data = item;
     fragment.appendChild(newElement);
   });
   pictureContainerElement.appendChild(fragment);
@@ -77,7 +85,6 @@ getPhotoList(mockups);
 // Показываем элемент big-picture
 
 var bigPictureElement = document.querySelector('.big-picture');
-// bigPictureElement.classList.remove('hidden');
 
 var fillCommentsList = function (list, arr) {
   var listItem = list.querySelector('li');
@@ -101,10 +108,28 @@ var fillBigPicture = function (data) {
   bigPictureElement.querySelector('.social__caption').textContent = data.description;
 };
 
-fillBigPicture(mockups[0]);
-bigPictureElement.querySelector('.social__comment-count').classList.add('hidden');
-bigPictureElement.querySelector('.comments-loader').classList.add('hidden');
+var onCloseBigPictureButtonClick = function () {
+  bigPictureElement.classList.add('hidden');
+  bigPictureElement.removeEventListener('click', onCloseBigPictureButtonClick);
+  document.removeEventListener('keydown', onEscBigPicturePress);
+};
 
+var onEscBigPicturePress = function (evt) {
+  if (evt.key === ESC_KEY) {
+    bigPictureElement.classList.add('hidden');
+    document.removeEventListener('keydown', onEscPress);
+  }
+};
+var showBigPicture = function (data) {
+  fillBigPicture(data);
+  bigPictureElement.querySelector('.social__comment-count').classList.add('hidden');
+  bigPictureElement.querySelector('.comments-loader').classList.add('hidden');
+  var closeButtonElement = bigPictureElement.querySelector('.big-picture__cancel');
+  closeButtonElement.addEventListener('click', onCloseBigPictureButtonClick);
+  document.addEventListener('keydown', onEscBigPicturePress);
+  bigPictureElement.classList.remove('hidden');
+
+};
 // Открытие формы для редактирования изображения
 var ESC_KEY = 'Escape';
 
