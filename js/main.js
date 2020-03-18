@@ -77,7 +77,7 @@ getPhotoList(mockups);
 // Показываем элемент big-picture
 
 var bigPictureElement = document.querySelector('.big-picture');
-bigPictureElement.classList.remove('hidden');
+// bigPictureElement.classList.remove('hidden');
 
 var fillCommentsList = function (list, arr) {
   var listItem = list.querySelector('li');
@@ -104,4 +104,172 @@ var fillBigPicture = function (data) {
 fillBigPicture(mockups[0]);
 bigPictureElement.querySelector('.social__comment-count').classList.add('hidden');
 bigPictureElement.querySelector('.comments-loader').classList.add('hidden');
-document.querySelector('body').classList.add('modal-open');
+
+// Открытие формы для редактирования изображения
+var ESC_KEY = 'Escape';
+
+var bodyElement = document.querySelector('body');
+var upLoadFormElement = document.querySelector('#upload-select-image');
+var uploadInputElement = upLoadFormElement.querySelector('#upload-file');
+var upLoadOverlayElement = upLoadFormElement.querySelector('.img-upload__overlay');
+var commentElement = upLoadFormElement.querySelector('textarea');
+var closeModal = function () {
+  disableRadios();
+  resetPreview();
+  upLoadOverlayElement.classList.add('hidden');
+  bodyElement.classList.remove('modal-open');
+  uploadInputElement.value = '';
+  upLoadFormElement.reset();
+  document.removeEventListener('keydown', onEscPress);
+};
+
+var openModal = function () {
+  bodyElement.classList.add('modal-open');
+  upLoadOverlayElement.classList.remove('hidden');
+  var closeButtonElement = upLoadOverlayElement.querySelector('#upload-cancel');
+  closeButtonElement.addEventListener('click', onCloseButtonClick);
+  document.addEventListener('keydown', onEscPress);
+  initSlider();
+  activateRadios();
+};
+
+var onCloseButtonClick = function () {
+  closeModal();
+};
+
+var onEscPress = function (evt) {
+  if (evt.key === ESC_KEY && evt.target !== hashtagsInputElement && evt.target !== commentElement) {
+    closeModal();
+  }
+};
+
+var onUploadChange = function (evt) {
+  evt.preventDefault();
+  openModal();
+};
+
+uploadInputElement.addEventListener('change', onUploadChange);
+
+// Определение уровня насыщенности эффекта
+var NO_EFFECT = 'effect-none';
+var ID_PREFIX = 'effect';
+var CLASS_PREFIX = 'effects__preview-';
+var PERCENTS = 100;
+var currentEffect;
+var uploadElement = document.querySelector('.img-upload');
+var previewElement = uploadElement.querySelector('.img-upload__preview img');
+var effectLineElement = uploadElement.querySelector('.effect-level__line');
+var pinElement = effectLineElement.querySelector('.effect-level__pin');
+var effectRadioElements = uploadElement.querySelectorAll('.effects__radio');
+var effectLevelInputElement = uploadElement.querySelector('.effect-level__value');
+var getCssText = {
+  'effect-chrome': function (level) {
+    return 'filter: grayscale(' + Math.round(level * 100) / 100 + ');';
+  },
+  'effect-sepia': function (level) {
+    return 'filter: sepia(' + Math.round(level * 100) / 100 + ');';
+  },
+  'effect-marvin': function (level) {
+    return 'filter: invert(' + Math.round(level * 100) + '%);';
+  },
+  'effect-phobos': function (level) {
+    return 'filter: blur(' + Math.round(level * 3) + 'px);';
+  },
+  'effect-heat': function (level) {
+    return 'filter: brightness(' + Math.round(level * 3) + ');';
+  }
+};
+
+var onEffectRadioChange = function (evt) {
+  if (currentEffect !== evt.target.id) {
+    currentEffect = evt.target.id;
+    previewElement.classList = '';
+    previewElement.style.cssText = '';
+    if (currentEffect !== NO_EFFECT) {
+      var newClass = currentEffect.replace(ID_PREFIX, CLASS_PREFIX);
+      previewElement.classList.add(newClass);
+    }
+  }
+};
+
+var updateCurrentEffect = function (level) {
+  previewElement.style.cssText = '';
+  previewElement.style.cssText = getCssText[currentEffect](level);
+  effectLevelInputElement.value = Math.round(level * PERCENTS);
+};
+
+var setEventListener = function (element) {
+  element.addEventListener('change', onEffectRadioChange);
+};
+
+var activateRadios = function () {
+  [].forEach.call(effectRadioElements, function (radio) {
+    setEventListener(radio);
+  });
+};
+
+var initSlider = function () {
+  var lineWidth = effectLineElement.offsetWidth;
+  var pinX = pinElement.offsetLeft;
+  var level = pinX / lineWidth;
+
+  var onPinMouseup = function (evt) {
+    var pinLocation = evt.target.offsetLeft;
+    level = pinLocation / lineWidth;
+    updateCurrentEffect(level);
+  };
+
+  pinElement.addEventListener('mouseup', onPinMouseup);
+};
+
+var resetPreview = function () {
+  currentEffect = null;
+  previewElement.removeAttribute('class');
+  previewElement.removeAttribute('style');
+};
+
+var disableRadios = function () {
+  previewElement.classList = '';
+  [].forEach.call(effectRadioElements, function (radio) {
+    radio.removeEventListener('change', onEffectRadioChange);
+  });
+};
+
+// Определяем валидность хэш-тэгов
+var MAX_HASHTAG_AMOUNT = 5;
+var MAX_HASHTAG_LENGTH = 20;
+var hashtagsInputElement = document.querySelector('.text__hashtags');
+var setHashtagsValidity = function (hashsString) {
+  hashtagsInputElement.setCustomValidity('');
+  var hashs = hashsString.split(' ');
+  var reg = /^#[a-zа-я0-9]+$/;
+  for (var i = 0; i < hashs.length; i++) {
+    var hash = hashs[i].toLowerCase();
+    var bool = reg.test(hash);
+    if (!bool) {
+      hashtagsInputElement.setCustomValidity('Не подходит формат хэш-тегов. Хэш-тэг должен начинаться с # и состоять только из букв и цифр');
+      return;
+    }
+    if (hash.length > MAX_HASHTAG_LENGTH) {
+      hashtagsInputElement.setCustomValidity('Длина хэш-тега не должна быть более 20 символов');
+      return;
+    }
+    for (var j = i + 1; j < hashs.length; j++) {
+      if (hash === hashs[j]) {
+        hashtagsInputElement.setCustomValidity('Хэш-теги не должны повторяться. Удалите повтряющиеся хэш-тэги.');
+        return;
+      }
+    }
+  }
+
+  if (hashs.length > MAX_HASHTAG_AMOUNT) {
+    hashtagsInputElement.setCustomValidity('Можно задать не более пяти хэш-тэгов');
+    return;
+  }
+  hashtagsInputElement.setCustomValidity('');
+};
+
+var onHashInputChange = function (evt) {
+  setHashtagsValidity(evt.target.value);
+};
+hashtagsInputElement.addEventListener('change', onHashInputChange);
