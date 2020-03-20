@@ -7,29 +7,74 @@
   var CLASS_PREFIX = 'effects__preview-';
   var PERCENTS = 100;
   var DEFAULT_LEVEL = '100%';
-  var currentEffect;
+  var MIN_SCALE = 0.25;
+  var MAX_SCALE = 1;
+
   var uploadElement = document.querySelector('.img-upload');
+  var scaleElement = uploadElement.querySelector('.scale');
+  var scaleInputElement = scaleElement.querySelector('.scale__control--value');
+  var reduceButtonElement = scaleElement.querySelector('.scale__control--smaller');
+  var enlargeButtonElement = scaleElement.querySelector('.scale__control--bigger');
   var previewElement = uploadElement.querySelector('.img-upload__preview img');
-  var effectLineElement = uploadElement.querySelector('.effect-level__line');
-  var pinElement = effectLineElement.querySelector('.effect-level__pin');
-  var effectDepthElement = effectLineElement.querySelector('.effect-level__depth');
   var effectRadioElements = uploadElement.querySelectorAll('.effects__radio');
-  var effectLevelInputElement = uploadElement.querySelector('.effect-level__value');
-  var getCssText = {
+
+  // Изменение размера изображения
+  var currentScale;
+
+  var changeImageSize = function (scale) {
+    previewElement.style.transform = 'scale(' + scale + ')';
+    scaleInputElement.value = scale * PERCENTS + '%';
+  };
+
+  var reduceImage = function () {
+    if (currentScale !== MIN_SCALE) {
+      currentScale -= MIN_SCALE;
+      changeImageSize(currentScale);
+    }
+  };
+
+  var enlargeImage = function () {
+    if (currentScale !== MAX_SCALE) {
+      currentScale += MIN_SCALE;
+      changeImageSize(currentScale);
+    }
+  };
+
+  var onReduceButtonClick = function (evt) {
+    evt.preventDefault();
+    reduceImage();
+  };
+
+  var onEnlargeButtonClick = function (evt) {
+    evt.preventDefault();
+    enlargeImage();
+  };
+
+  var activateScale = function () {
+    currentScale = MAX_SCALE;
+    scaleInputElement.value = DEFAULT_LEVEL;
+    reduceButtonElement.addEventListener('click', onReduceButtonClick);
+    enlargeButtonElement.addEventListener('click', onEnlargeButtonClick);
+  };
+
+  // Наложение фильтров на изображение
+  var currentEffect;
+
+  var getFilterProperty = {
     'effect-chrome': function (level) {
-      return 'filter: grayscale(' + level / PERCENTS + ');';
+      return 'grayscale(' + level / PERCENTS + ')';
     },
     'effect-sepia': function (level) {
-      return 'filter: sepia(' + level / PERCENTS + ');';
+      return 'sepia(' + level / PERCENTS + ')';
     },
     'effect-marvin': function (level) {
-      return 'filter: invert(' + level + '%);';
+      return 'invert(' + level + '%)';
     },
     'effect-phobos': function (level) {
-      return 'filter: blur(' + Math.round(level * 3 / PERCENTS) + 'px);';
+      return 'blur(' + Math.round(level * 3 / PERCENTS) + 'px)';
     },
     'effect-heat': function (level) {
-      return 'filter: brightness(' + Math.round(level * 3 / PERCENTS) + ');';
+      return 'brightness(' + Math.round(level * 3 / PERCENTS) + ')';
     }
   };
 
@@ -37,24 +82,21 @@
     if (currentEffect !== evt.target.id) {
       currentEffect = evt.target.id;
       previewElement.classList = '';
-      previewElement.style.cssText = '';
+      previewElement.style.filter = 'none';
       if (currentEffect !== NO_EFFECT) {
         var newClass = currentEffect.replace(ID_PREFIX, CLASS_PREFIX);
         previewElement.classList.add(newClass);
-        resetSlider(pinElement, effectDepthElement);
+        updateCurrentEffect(PERCENTS);
+        window.slider.update();
       }
     }
   };
 
   var updateCurrentEffect = function (level) {
     if (currentEffect) {
-      previewElement.style.cssText = '';
-      previewElement.style.cssText = getCssText[currentEffect](level);
+      previewElement.style.filter = 'none';
+      previewElement.style.filter = getFilterProperty[currentEffect](level);
     }
-  };
-
-  var setNewEffectLevel = function (level) {
-    effectLevelInputElement.value = level;
   };
 
   var setEventListener = function (element) {
@@ -65,66 +107,6 @@
     [].forEach.call(effectRadioElements, function (radio) {
       setEventListener(radio);
     });
-  };
-
-  var resetSlider = function () {
-    pinElement.style.left = DEFAULT_LEVEL;
-    effectDepthElement.style.width = DEFAULT_LEVEL;
-    effectLevelInputElement.value = PERCENTS;
-  };
-
-  // Слайдер
-  var PIN_RADIUS = 9;
-  var MIN_X = 0;
-  var initSlider = function () {
-    var lineWidth = effectLineElement.offsetWidth;
-    var maxX = MIN_X + lineWidth;
-    pinElement.x = pinElement.offsetLeft;
-    var level;
-
-    var setPinLocation = function (x) {
-      if (x <= maxX && x >= MIN_X) {
-        pinElement.x = x;
-      }
-    };
-
-    var getEffectLevel = function (coord) {
-      return Math.round(coord * PERCENTS / lineWidth);
-    };
-
-    level = getEffectLevel(pinElement.x);
-
-
-    var onMousedown = function (evt) {
-      evt.preventDefault();
-      var startX = evt.clientX;
-      var shift;
-      var currentX = evt.target.offsetLeft;
-
-      var onMousemove = function (moveEvt) {
-        moveEvt.preventDefault();
-        shift = startX - moveEvt.clientX;
-        currentX -= shift;
-        startX = moveEvt.clientX;
-        setPinLocation(currentX);
-        level = getEffectLevel(pinElement.x + PIN_RADIUS);
-        pinElement.style.left = pinElement.x + 'px';
-        effectDepthElement.style.width = pinElement.x + PIN_RADIUS + 'px';
-        updateCurrentEffect(level);
-        setNewEffectLevel(level);
-      };
-
-      var onMouseup = function (upEvt) {
-        upEvt.preventDefault();
-        document.removeEventListener('mousemove', onMousemove);
-        document.removeEventListener('mouseup', onMouseup);
-      };
-
-      document.addEventListener('mousemove', onMousemove);
-      document.addEventListener('mouseup', onMouseup);
-    };
-
-    pinElement.addEventListener('mousedown', onMousedown);
   };
 
   var resetPreview = function () {
@@ -141,13 +123,15 @@
   };
 
   var enablePictureEditor = function () {
+    activateScale();
     activateRadios();
-    initSlider();
+    window.slider.init(updateCurrentEffect);
   };
 
   var disablePictureEditor = function () {
     disableRadios();
     resetPreview();
+    window.slider.reset();
   };
 
   window.picture = {
