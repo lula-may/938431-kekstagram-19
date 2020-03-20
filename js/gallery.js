@@ -24,7 +24,7 @@ var getPhotoList = function (arr) {
   pictureContainerElement.appendChild(fragment);
 };
 
-getPhotoList(window.data);
+window.backend.load(getPhotoList, window.error.show);
 
 // Открытие формы для редактирования изображения
 var ESC_KEY = 'Escape';
