@@ -1,9 +1,9 @@
 'use strict';
 
 (function () {
-  var MIN_X = 0;
+  var PIN_RADIUS = 9;
+  var DOUBLE = 2;
   var PERCENTS = 100;
-  var DEFAULT_LEVEL = '100%';
 
   var uploadElement = document.querySelector('.img-upload');
   var effectLineElement = uploadElement.querySelector('.effect-level__line');
@@ -11,18 +11,19 @@
   var effectDepthElement = effectLineElement.querySelector('.effect-level__depth');
   var effectLevelInputElement = uploadElement.querySelector('.effect-level__value');
 
+  var maxX;
   var setNewEffectLevel = function (level) {
     effectLevelInputElement.value = level;
   };
-  var setPinLocation = function (x, maxX) {
-    if (x <= maxX && x >= MIN_X) {
+  var setPinLocation = function (x) {
+    if (x <= maxX && x >= PIN_RADIUS) {
       pinElement.x = x;
     }
   };
 
   var initSlider = function (onStateChange) {
-    var lineWidth = effectLineElement.offsetWidth;
-    var maxX = MIN_X + lineWidth;
+    var lineWidth = effectLineElement.offsetWidth - PIN_RADIUS * DOUBLE;
+    maxX = lineWidth + PIN_RADIUS;
     pinElement.x = pinElement.offsetLeft;
     var level;
 
@@ -45,7 +46,7 @@
         currentX -= shift;
         startX = moveEvt.clientX;
         setPinLocation(currentX, maxX);
-        level = getEffectLevel(pinElement.x);
+        level = getEffectLevel(pinElement.x - PIN_RADIUS);
         pinElement.style.left = pinElement.x + 'px';
         effectDepthElement.style.width = pinElement.x + 'px';
         onStateChange(level);
@@ -66,8 +67,8 @@
   };
 
   var updateSlider = function () {
-    pinElement.style.left = DEFAULT_LEVEL;
-    effectDepthElement.style.width = DEFAULT_LEVEL;
+    pinElement.style.left = maxX + 'px';
+    effectDepthElement.style.width = maxX + 'px';
     effectLevelInputElement.value = PERCENTS;
   };
 
