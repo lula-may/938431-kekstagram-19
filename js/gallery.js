@@ -1,15 +1,25 @@
 'use strict';
 
 (function () {
-  // Создаем элементы на основе полученных данных данных
+  var ESC_KEY = 'Escape';
+
+  var bodyElement = document.querySelector('body');
+  var upLoadFormElement = document.querySelector('#upload-select-image');
+  var uploadInputElement = upLoadFormElement.querySelector('#upload-file');
+  var upLoadOverlayElement = upLoadFormElement.querySelector('.img-upload__overlay');
+  var hashtagsInputElement = document.querySelector('.text__hashtags');
+  var commentElement = upLoadFormElement.querySelector('textarea');
   var template = document.querySelector('#picture').content;
   var pictureContainerElement = document.querySelector('.pictures');
+  var photos = [];
+  // Показываем фотографию при клике на превью
   var onPictureClick = function (evt) {
     evt.preventDefault();
     var picture = evt.currentTarget;
     window.preview.show(picture.data);
   };
 
+  // Создаем элементы на основе полученных данных данных
   var getPhotoList = function (arr) {
     var fragment = document.createDocumentFragment();
     arr.forEach(function (item) {
@@ -20,23 +30,21 @@
       newElement.querySelector('.picture__comments').textContent = item.comments.length;
       picture.addEventListener('click', onPictureClick);
       picture.data = item;
+      photos.push(picture);
       fragment.appendChild(newElement);
     });
     pictureContainerElement.appendChild(fragment);
   };
 
-  window.backend.load(getPhotoList, window.error.show);
+  var updatePhotoList = function (arr) {
+    photos.forEach(function (el) {
+      el.remove();
+    });
+    photos = [];
+    getPhotoList(arr);
+  };
 
-  // Открытие формы для редактирования изображения
-  var ESC_KEY = 'Escape';
-
-  var bodyElement = document.querySelector('body');
-  var upLoadFormElement = document.querySelector('#upload-select-image');
-  var uploadInputElement = upLoadFormElement.querySelector('#upload-file');
-  var upLoadOverlayElement = upLoadFormElement.querySelector('.img-upload__overlay');
-  var hashtagsInputElement = document.querySelector('.text__hashtags');
-  var commentElement = upLoadFormElement.querySelector('textarea');
-
+  // Открытие и закрытие формы для редактирования изображения
   var closeModal = function () {
     window.form.disable();
     upLoadOverlayElement.classList.add('hidden');
@@ -68,9 +76,18 @@
     openModal();
   };
 
+  // Загрузка данных с сервера
+  var onSuccessLoad = function (data) {
+    getPhotoList(data);
+    window.filter.enable(data);
+  };
+
+  window.backend.load(onSuccessLoad, window.error.show);
+
   uploadInputElement.addEventListener('change', onUploadChange);
 
   window.gallery = {
+    update: updatePhotoList,
     closeModal: closeModal
   };
 })();
