@@ -1,15 +1,14 @@
 'use strict';
 
 (function () {
-  var upLoadFormElement = document.querySelector('#upload-select-image');
-  var uploadInputElement = upLoadFormElement.querySelector('#upload-file');
+  var uploadFormElement = document.querySelector('#upload-select-image');
+  var uploadInputElement = uploadFormElement.querySelector('#upload-file');
 
   // Определяем валидность хэш-тэгов
   var MAX_HASHTAG_AMOUNT = 5;
   var MAX_HASHTAG_LENGTH = 20;
   var hashtagsInputElement = document.querySelector('.text__hashtags');
   var setHashtagsValidity = function (hashsString) {
-    hashtagsInputElement.setCustomValidity('');
     var hashs = hashsString.split(/ +/);
     if (!hashs[hashs.length - 1]) {
       hashs.pop();
@@ -52,19 +51,22 @@
 
   var onFormSubmit = function (evt) {
     evt.preventDefault();
-    window.backend.save(new FormData(upLoadFormElement), onSuccessfulSend, window.error.show);
+    return (uploadFormElement.reportValidity())
+      ? window.backend.save(new FormData(uploadFormElement), onSuccessfulSend, window.error.show)
+      : uploadFormElement.classList.add('img-upload__form--invalid');
   };
 
   var enableForm = function () {
     window.picture.enable();
     hashtagsInputElement.addEventListener('change', onHashInputChange);
-    upLoadFormElement.addEventListener('submit', onFormSubmit);
+    uploadFormElement.addEventListener('submit', onFormSubmit);
   };
 
   var disableForm = function () {
     window.picture.disable();
     uploadInputElement.value = '';
-    upLoadFormElement.reset();
+    uploadFormElement.reset();
+    uploadFormElement.classList.toggle('img-upload__form--invalid', false);
   };
 
   window.form = {

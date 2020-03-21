@@ -388,6 +388,10 @@ main {
   outline: auto 5px highlight;
 }
 
+.img-upload__form--invalid input:invalid,
+.img-upload__form--invalid textarea:invalid {
+  outline: 2px solid red;
+}
 
 /* Окно для редактирования изображения
    ========================================================================== */
