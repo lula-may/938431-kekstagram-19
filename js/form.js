@@ -41,13 +41,24 @@
     hashtagsInputElement.setCustomValidity('');
   };
 
+  var onSuccessfulSend = function (response) {
+    window.success.show(response);
+    window.gallery.closeModal();
+  };
+
   var onHashInputChange = function (evt) {
     setHashtagsValidity(evt.target.value);
+  };
+
+  var onFormSubmit = function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(upLoadFormElement), onSuccessfulSend, window.error.show);
   };
 
   var enableForm = function () {
     window.picture.enable();
     hashtagsInputElement.addEventListener('change', onHashInputChange);
+    upLoadFormElement.addEventListener('submit', onFormSubmit);
   };
 
   var disableForm = function () {
