@@ -61,7 +61,6 @@
     [].forEach.call(filterElements, function (el) {
       el.addEventListener('click', onFilterButtonClick);
     });
-    getDiscussedPhotos();
   };
 
   window.filter = {
