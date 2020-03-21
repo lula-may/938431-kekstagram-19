@@ -5,11 +5,11 @@
   var DOUBLE = 2;
   var PERCENTS = 100;
 
-  var uploadElement = document.querySelector('.img-upload');
-  var effectLineElement = uploadElement.querySelector('.effect-level__line');
+  var sliderElement = document.querySelector('.effect-level');
+  var effectLineElement = sliderElement.querySelector('.effect-level__line');
   var pinElement = effectLineElement.querySelector('.effect-level__pin');
   var effectDepthElement = effectLineElement.querySelector('.effect-level__depth');
-  var effectLevelInputElement = uploadElement.querySelector('.effect-level__value');
+  var effectLevelInputElement = sliderElement.querySelector('.effect-level__value');
 
   var maxX;
   var setNewEffectLevel = function (level) {
