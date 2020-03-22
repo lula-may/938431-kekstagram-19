@@ -1,23 +1,24 @@
 'use strict';
 
 (function () {
-  var uploadFormElement = document.querySelector('#upload-select-image');
-  var uploadInputElement = uploadFormElement.querySelector('#upload-file');
-
-  // Определяем валидность хэш-тэгов
   var MAX_HASHTAG_AMOUNT = 5;
   var MAX_HASHTAG_LENGTH = 20;
+  var REG = /^#[a-zа-я0-9]+$/;
+
+  var uploadFormElement = document.querySelector('#upload-select-image');
+  var uploadInputElement = uploadFormElement.querySelector('#upload-file');
   var hashtagsInputElement = document.querySelector('.text__hashtags');
+
+  // Определяем валидность хэш-тэгов
   var setHashtagsValidity = function (hashsString) {
     var hashs = hashsString.split(/ +/);
     if (!hashs[hashs.length - 1]) {
       hashs.pop();
     }
-    var reg = /^#[a-zа-я0-9]+$/;
     for (var i = 0; i < hashs.length; i++) {
       var hash = hashs[i].toLowerCase();
-      var bool = reg.test(hash);
-      if (!bool) {
+      var match = REG.test(hash);
+      if (!match) {
         hashtagsInputElement.setCustomValidity('Не подходит формат хэш-тегов. Хэш-тэг должен начинаться с # и состоять только из букв и цифр');
         return;
       }

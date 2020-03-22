@@ -124,16 +124,9 @@
   };
 
   var resetPreview = function () {
-    currentEffect = null;
+    currentEffect = '';
     previewElement.removeAttribute('class');
     previewElement.removeAttribute('style');
-  };
-
-  var disableRadios = function () {
-    previewElement.classList = '';
-    [].forEach.call(effectRadioElements, function (radio) {
-      radio.removeEventListener('change', onEffectRadioChange);
-    });
   };
 
   var enablePictureEditor = function () {
@@ -146,11 +139,9 @@
   };
 
   var disablePictureEditor = function () {
-    disableRadios();
     resetPreview();
     uploadElement.reset();
     window.slider.reset();
-    currentEffect = '';
   };
 
   window.picture = {

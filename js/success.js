@@ -8,13 +8,13 @@
   var successContainerElement = document.querySelector('main');
   var successElement;
 
-  var escPressHandler = function (evt) {
+  var onEscPress = function (evt) {
     if (evt.key === ESC_KEY) {
       hideMessage();
     }
   };
 
-  var documentClickHandler = function (evt) {
+  var onDocumentClick = function (evt) {
     if (evt.button === LEFT_MOUSE_BUTTON) {
       hideMessage();
     }
@@ -22,14 +22,14 @@
 
   var hideMessage = function () {
     successElement.remove();
-    document.removeEventListener('keydown', escPressHandler);
-    window.removeEventListener('click', documentClickHandler);
+    document.removeEventListener('keydown', onEscPress);
+    window.removeEventListener('click', onDocumentClick);
   };
 
   var showMessage = function () {
     successElement = successTemplate.cloneNode(true);
-    document.addEventListener('keydown', escPressHandler);
-    document.addEventListener('mousedown', documentClickHandler);
+    document.addEventListener('keydown', onEscPress);
+    document.addEventListener('mousedown', onDocumentClick);
     successContainerElement.appendChild(successElement);
   };
 

@@ -10,11 +10,12 @@
   var pinElement = effectLineElement.querySelector('.effect-level__pin');
   var effectDepthElement = effectLineElement.querySelector('.effect-level__depth');
   var effectLevelInputElement = sliderElement.querySelector('.effect-level__value');
-
   var maxX;
+
   var setNewEffectLevel = function (level) {
     effectLevelInputElement.value = level;
   };
+
   var setPinLocation = function (x) {
     if (x <= maxX && x >= PIN_RADIUS) {
       pinElement.x = x;

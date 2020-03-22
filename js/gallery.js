@@ -12,6 +12,7 @@
   var template = document.querySelector('#picture').content;
   var pictureContainerElement = document.querySelector('.pictures');
   var photos = [];
+
   // Показываем фотографию при клике на превью
   var onPictureClick = function (evt) {
     evt.preventDefault();

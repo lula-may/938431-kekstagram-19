@@ -8,18 +8,18 @@
   var errorContainerElement = document.querySelector('main');
   var errorElement;
 
-  var buttonClickHandler = function (evt) {
+  var onButtonClick = function (evt) {
     evt.preventDefault();
     hideErrorMessage();
   };
 
-  var escPressHandler = function (evt) {
+  var onEscPress = function (evt) {
     if (evt.key === ESC_KEY) {
       hideErrorMessage();
     }
   };
 
-  var documentClickHandler = function (evt) {
+  var onDocumentClick = function (evt) {
     if (evt.button === LEFT_MOUSE_BUTTON) {
       hideErrorMessage();
     }
@@ -27,17 +27,17 @@
 
   var hideErrorMessage = function () {
     errorElement.remove();
-    document.removeEventListener('keydown', escPressHandler);
-    window.removeEventListener('click', documentClickHandler);
+    document.removeEventListener('keydown', onEscPress);
+    window.removeEventListener('click', onDocumentClick);
   };
 
   var showErrorMessage = function (message) {
     errorElement = errorTemplate.cloneNode(true);
     var button = errorElement.querySelector('.error__button');
     errorElement.querySelector('.error__title').textContent = message;
-    button.addEventListener('click', buttonClickHandler);
-    document.addEventListener('keydown', escPressHandler);
-    document.addEventListener('mousedown', documentClickHandler);
+    button.addEventListener('click', onButtonClick);
+    document.addEventListener('keydown', onEscPress);
+    document.addEventListener('mousedown', onDocumentClick);
     errorContainerElement.appendChild(errorElement);
   };
 

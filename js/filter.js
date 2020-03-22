@@ -29,13 +29,12 @@
 
   var getDiscussedPhotos = function () {
     var copies = serverPhotos.slice();
-    copies.sort(function (left, right) {
+    return copies.sort(function (left, right) {
       return right.comments.length - left.comments.length;
     });
-    return copies;
   };
 
-  var sortedData = {
+  var sortData = {
     'default': getDefaultPhotos,
     'random': getRandomPhotos,
     'discussed': getDiscussedPhotos
@@ -46,7 +45,7 @@
     currentFilter = newFilter;
     currentFilter.classList.add('img-filters__button--active');
     var filterName = (currentFilter.id).replace(PREFIX, '');
-    window.gallery.update(sortedData[filterName]());
+    window.gallery.update(sortData[filterName]());
   });
 
   var onFilterButtonClick = function (evt) {
