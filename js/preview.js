@@ -9,6 +9,7 @@
   var moreCommentsElement = bigPictureElement.querySelector('.comments-loader');
   var commentsAmountElement = bigPictureElement.querySelector('.comments-amount');
   var commentsCount;
+  var onMoreCommentsClick = function () {};
 
   // Показываем комментарии других пользователей
   var showCommentsPortion = function (listItem, list, arr) {
@@ -40,7 +41,7 @@
     var copies = arr.slice();
     commentsCount = 0;
 
-    var onMoreCommentsClick = function () {
+    onMoreCommentsClick = function () {
       getMoreComments(copies, listItem, list, commentsAmount);
     };
 
@@ -62,6 +63,7 @@
   var closePreview = function () {
     bigPictureElement.classList.add('hidden');
     document.removeEventListener('keydown', onEscPress);
+    moreCommentsElement.removeEventListener('click', onMoreCommentsClick);
     moreCommentsElement.classList.remove('hidden');
   };
 
