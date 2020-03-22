@@ -74,6 +74,8 @@
 
   var onUploadChange = function (evt) {
     evt.preventDefault();
+    var userFile = uploadInputElement.files[0];
+    window.userImg.show(userFile);
     openModal();
   };
 
