@@ -26,7 +26,7 @@
         return;
       }
       for (var j = i + 1; j < hashs.length; j++) {
-        if (hash === hashs[j]) {
+        if (hash === hashs[j].toLowerCase()) {
           hashtagsInputElement.setCustomValidity('Хэш-теги не должны повторяться. Удалите повтряющиеся хэш-тэги.');
           return;
         }
