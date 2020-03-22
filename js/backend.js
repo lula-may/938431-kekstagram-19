@@ -13,7 +13,6 @@
   };
   var TIMEOUT_IN_MS = 10000;
 
-
   var parseResponse = function (request, onSuccess, onError) {
     switch (request.status) {
       case Code.STATUS_OK:
